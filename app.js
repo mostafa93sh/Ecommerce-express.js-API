@@ -1,8 +1,10 @@
 require("dotenv").config();
 require("express-async-errors");
-
+//express
 const express = require("express");
 const app = express();
+// other packages
+const morgan = require("morgan");
 // database
 const connectDB = require("./db/connect");
 
@@ -11,6 +13,7 @@ const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
 
 app.use(express.json());
+app.use(morgan("tiny"));
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
