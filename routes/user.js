@@ -9,6 +9,8 @@ const {
   updateUserPassword,
 } = require("../controllers/userController");
 
-router.get("/", getAllUsers);
+const authenticatedUser = require("../middleware/authentication");
+
+router.get("/", authenticatedUser, getAllUsers);
 
 module.exports = router;
