@@ -1,9 +1,11 @@
 const jwt = require("jsonwebtoken");
+const { StatusCodes } = require("http-status-codes");
+const { BadRequestError, UnauthenticatedError } = require("../errors");
 
 const authenticatedUser = (req, res, next) => {
   const token = req.signedCookies.token;
   if (!token) {
-    return res.status(401).json({ message: "Unauthorized" });
+    throw new UnauthenticatedError("Unauthorized");
   } else {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -11,9 +13,22 @@ const authenticatedUser = (req, res, next) => {
       console.log(req.user);
       next();
     } catch (error) {
-      return res.status(401).json({ message: "Unauthorized" });
+      throw new UnauthenticatedError("Unauthorized");
     }
   }
 };
 
-module.exports = authenticatedUser;
+const authorizePermissions = (...roles) => {
+  return (req, res, next) => {
+    const { role } = req.user;
+    if (!roles.includes(role)) {
+      throw new UnauthenticatedError("Unauthorized to access this route");
+    }
+    next();
+  };
+};
+
+module.exports = {
+  authenticatedUser,
+  authorizePermissions,
+};
